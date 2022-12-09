@@ -21,7 +21,6 @@ variable "auth0_client_id" {
 variable "auth0_client_secret" {
   type        = string
   description = "Auth0 client secret"
-  default = "th87nPX5PE3GytJu0PIcGmZy2marJwqd6-h5CWrOIf2YH8tQmvjgZhW-seyyuFdh"
 }
 
 variable "client_callbacks" {
