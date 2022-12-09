@@ -1,0 +1,27 @@
+name: Apply Terraform - Development
+
+on:
+  push:
+    branches:
+    - main
+                        
+env:
+  region: "eu-north-1"
+  enviroment: "development"
+  GIT_HASH: ${{ github.sha }}
+  REPO_NAME: ${{ github.event.repository.name }}  
+
+permissions:
+  id-token: write
+  contents: read
+    
+jobs:
+  PlanAndApply:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Call Foo
+        uses: AgosOrg/play_gh_actions/.github/actions/foo@main
