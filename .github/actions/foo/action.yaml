@@ -16,4 +16,7 @@ runs:
 
   - name: SayBla
     shell: bash
-    run: echo Bla bla ${{ inputs.ENV_PUB_KEY }}
+    run: |
+      echo Bla bla ${{ inputs.ENV_PUB_KEY }}
+      echo ${{ inputs.ENV_PUB_KEY }} >> bla.md
+      cat bla.md
