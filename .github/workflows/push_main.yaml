@@ -25,3 +25,5 @@ jobs:
 
       - name: Call Foo
         uses: AgosOrg/simple_play_TF/.github/actions/foo@main
+        with:
+          ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}

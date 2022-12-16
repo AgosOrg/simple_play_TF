@@ -1,6 +1,11 @@
 name: Foo
 description: Foo
 
+inputs:
+  ENV_PUB_KEY:
+    required: true
+    description: "ENV_PUB_KEY...."
+
 runs:
   using: "composite"
   steps:
@@ -11,4 +16,4 @@ runs:
 
   - name: SayBla
     shell: bash
-    run: echo Bla bla ${{ secrets.ENV_PUB_KEY }}
+    run: echo Bla bla ${{ inputs.ENV_PUB_KEY }}
