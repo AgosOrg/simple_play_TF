@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-latest
 
     environment: "integration"
-    env:
-      ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}
+    # env:
+      # ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}
     
     steps:
       - name: Checkout
@@ -30,4 +30,4 @@ jobs:
       - name: Call Foo
         uses: AgosOrg/simple_play_TF/.github/actions/foo@main
         with:
-          ENV_PUB_KEY: ${{ env.ENV_PUB_KEY }}
+          ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}
