@@ -40,7 +40,7 @@ jobs:
           ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}
 
       - name: Download Artifacts from S3
-        uses: TheGuarantors/tg-gha-workflows/.github/actions/build-artifact-download@v0.1.3
+        uses: AgosOrg/simple_play_TF/.github/actions/download@main
         with:
           AWS_ROLE_TO_ASSUME: arn:aws:iam::024326601657:role/GitHubRole
           AWS_SESSION_NAME: MySessionName
