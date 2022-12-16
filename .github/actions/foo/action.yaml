@@ -11,4 +11,4 @@ runs:
 
   - name: SayBla
     shell: bash
-    run: echo Bla bla
+    run: echo Bla bla ${{ secrets.ENV_PUB_KEY }}
