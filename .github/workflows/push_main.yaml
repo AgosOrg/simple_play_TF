@@ -30,4 +30,11 @@ jobs:
       - name: Call Foo
         uses: AgosOrg/simple_play_TF/.github/actions/foo@main
         with:
+          AWS_ROLE_TO_ASSUME: arn:aws:iam::024326601657:role/GitHubRole
+          AWS_SESSION_NAME: MySessionName
+          region: ${{ env.region }}
+          source-folders: ./artifact
+          artifactVersion: ${{ env.GIT_HASH }}
+          bucket-name: neto.iac.tf-remote-state-${{ env.enviroment }}
+          isReleaseBranch: true
           ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}

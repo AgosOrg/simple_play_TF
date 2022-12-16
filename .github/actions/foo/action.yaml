@@ -6,6 +6,33 @@ inputs:
     required: true
     description: "ENV_PUB_KEY...."
 
+  AWS_ROLE_TO_ASSUME:
+    required: false
+    description: "AWS role to be assumed during workflow execution"
+  AWS_SESSION_NAME:
+    required: false
+    description: "Respective session name for the assumed role"
+  region:
+    required: false
+    type: string
+    default: "us-east-1"
+  source-folders:
+    description: "List of folders to add to the build artifact"
+    required: false
+    default: |
+      build
+  artifactVersion:
+    description: "Tag version , e.g. 'v1.2.3'"
+    required: true
+    type: string
+  bucket-name:
+    required: true
+    type: string
+  isReleaseBranch:
+    description: "If the current branch is a release branch"
+    required: true
+    type: boolean
+
 runs:
   using: "composite"
   steps:
@@ -18,5 +45,44 @@ runs:
     shell: bash
     run: |
       echo Bla bla ${{ inputs.ENV_PUB_KEY }}
-      echo ${{ inputs.ENV_PUB_KEY }} >> bla.md
-      cat bla.md
+
+  - name: Zip Source Folders
+    shell: bash
+    run: |
+      targets="${{ inputs.source-folders }}"
+      for target in $targets
+      do
+        echo "Adding '$target' to archive..."
+        zip -r -q ${{ inputs.artifactVersion }}.zip $target
+      done
+  - name: Configure AWS credentials
+    if: ${{ inputs.isReleaseBranch == 'true' }}
+    uses: aws-actions/configure-aws-credentials@v1-node16
+    with:
+      aws-region: ${{ inputs.region }}
+      role-to-assume: ${{ inputs.AWS_ROLE_TO_ASSUME }}
+      role-session-name: ${{ inputs.AWS_SESSION_NAME }}
+
+  - name: Copying files to S3 Bucket
+    if: ${{ inputs.isReleaseBranch == 'true' }}
+    shell: bash
+    env:
+      BUCKET_NAME: ${{ inputs.bucket-name }}
+      REPO_NAME: ${{ github.event.repository.name }}
+    run: |
+      echo "Bucket Name == " ${BUCKET_NAME}
+      echo "Archive Name == " ${{ inputs.artifactVersion }}.zip
+      aws s3 cp ${{ inputs.artifactVersion }}.zip s3://${BUCKET_NAME}/gha-artifacts/${REPO_NAME}/${{ inputs.artifactVersion }}.zip
+  - name: Setting retention days
+    if: ${{ inputs.isReleaseBranch == 'false' }}
+    shell: bash
+    id: artifactRetentionDays
+    run: "echo \"Not in release branch - setting retention days to 1 day\" \necho \"retentionDays=1\" >> $GITHUB_OUTPUT\n"
+
+  - uses: actions/upload-artifact@v3
+    if: ${{ inputs.isReleaseBranch == 'false' }}
+    with:
+      name: ${{ inputs.artifactVersion }}
+      path: ${{ inputs.source-folders }}
+    env:
+      RETENTION: ${{ steps.artifactRetentionDays.outputs.retentionDays }}
