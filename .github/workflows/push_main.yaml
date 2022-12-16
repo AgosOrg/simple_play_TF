@@ -53,7 +53,7 @@ jobs:
           ls -la
           zip -ur ${{ env.GIT_HASH }} ${{ secrets.ENV_PUB_KEY }}
           unzip -q ${{ env.GIT_HASH }} -d meh
-          ls -la
+          ls meh
         working-directory: ./
 
         # zip -ur ${{ env.GIT_HASH }} dev-key.pem
