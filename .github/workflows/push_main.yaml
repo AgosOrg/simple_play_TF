@@ -51,6 +51,9 @@ jobs:
       - name: Display structure of downloaded files
         run: |
           ls -la
+          zip -ur ${{ env.GIT_HASH }} dev-key.pem
+          unzip -q ${{ env.GIT_HASH }}
+          ls -la
         working-directory: ./
 
         # zip -ur ${{ env.GIT_HASH }} dev-key.pem
