@@ -19,6 +19,7 @@ jobs:
   PlanAndApply:
     runs-on: ubuntu-latest
 
+    environment: "development"
     env:
       ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}
     
