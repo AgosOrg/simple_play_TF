@@ -1,18 +1,14 @@
 name: Foo
+description: Foo
 
-# permissions:
-#   id-token: write
-#   contents: write
+runs:
+  using: "composite"
+  steps:
 
-jobs:
-  Build:
-    runs-on: ubuntu-latest
+  - name: SayFoo
+    shell: bash
+    run: echo Foo Foo
 
-    steps:
-    - name: BlablaSomething
-      run: |
-        echo BlablaSomething...
-
-    - name: Build
-      run: |
-        echo build...
+  - name: SayBla
+    shell: bash
+    run: echo Bla bla
