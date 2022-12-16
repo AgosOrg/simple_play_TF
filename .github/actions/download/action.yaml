@@ -1,11 +1,7 @@
-name: Foo
-description: Foo
+name: Download
+description: Download
 
 inputs:
-  ENV_PUB_KEY:
-    required: true
-    description: "ENV_PUB_KEY...."
-
   AWS_ROLE_TO_ASSUME:
     required: false
     description: "AWS role to be assumed during workflow execution"
@@ -16,73 +12,43 @@ inputs:
     required: false
     type: string
     default: "us-east-1"
-  source-folders:
-    description: "List of folders to add to the build artifact"
-    required: false
-    default: |
-      build
-  artifactVersion:
-    description: "Tag version , e.g. 'v1.2.3'"
-    required: true
-    type: string
   bucket-name:
     required: true
     type: string
-  isReleaseBranch:
-    description: "If the current branch is a release branch"
+  artifact-version:
+    description: "Name of the archive to download, e.g. 'v1.2.3'"
     required: true
-    type: boolean
+    type: string
+  path:
+    description: "Directory for downloaded files"
+    required: true
+    type: string
 
 runs:
   using: "composite"
   steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-region: ${{ inputs.region }}
+        role-to-assume: ${{ inputs.AWS_ROLE_TO_ASSUME }}
+        role-session-name: ${{ inputs.AWS_SESSION_NAME }}
 
-  - name: SayFoo
-    shell: bash
-    run: echo Foo Foo
+    - name: Copying files from S3 Bucket
+      shell: bash
+      env:
+        BUCKET_NAME: ${{ inputs.bucket-name }}
+        DOWNLOAD_FOLDER: ${{ inputs.path }}
+        ARTIFACT_VERSION: ${{ inputs.artifact-version }}
+        REPO_NAME: ${{ github.event.repository.name }}
+      run: |
+        echo "Download folder == " ${DOWNLOAD_FOLDER}
+        echo "Bucket Name == " ${BUCKET_NAME}
+        echo "Artifact Version == " ${ARTIFACT_VERSION}
+        mkdir -p {{ inputs.path }}
+        aws s3 cp s3://${BUCKET_NAME}/gha-artifacts/${REPO_NAME}/${ARTIFACT_VERSION}.zip ${DOWNLOAD_FOLDER}/${ARTIFACT_VERSION}.zip
 
-  - name: SayBla
-    shell: bash
-    run: |
-      echo Bla bla ${{ inputs.ENV_PUB_KEY }}
-
-  - name: Zip Source Folders
-    shell: bash
-    run: |
-      targets="${{ inputs.source-folders }}"
-      for target in $targets
-      do
-        echo "Adding '$target' to archive..."
-        zip -r -q ${{ inputs.artifactVersion }}.zip $target
-      done
-  - name: Configure AWS credentials
-    if: ${{ inputs.isReleaseBranch == 'true' }}
-    uses: aws-actions/configure-aws-credentials@v1-node16
-    with:
-      aws-region: ${{ inputs.region }}
-      role-to-assume: ${{ inputs.AWS_ROLE_TO_ASSUME }}
-      role-session-name: ${{ inputs.AWS_SESSION_NAME }}
-
-  - name: Copying files to S3 Bucket
-    if: ${{ inputs.isReleaseBranch == 'true' }}
-    shell: bash
-    env:
-      BUCKET_NAME: ${{ inputs.bucket-name }}
-      REPO_NAME: ${{ github.event.repository.name }}
-    run: |
-      echo "Bucket Name == " ${BUCKET_NAME}
-      echo "Archive Name == " ${{ inputs.artifactVersion }}.zip
-      aws s3 cp ${{ inputs.artifactVersion }}.zip s3://${BUCKET_NAME}/gha-artifacts/${REPO_NAME}/${{ inputs.artifactVersion }}.zip
-  - name: Setting retention days
-    if: ${{ inputs.isReleaseBranch == 'false' }}
-    shell: bash
-    id: artifactRetentionDays
-    run: "echo \"Not in release branch - setting retention days to 1 day\" \necho \"retentionDays=1\" >> $GITHUB_OUTPUT\n"
-
-  - uses: actions/upload-artifact@v3
-    if: ${{ inputs.isReleaseBranch == 'false' }}
-    with:
-      name: ${{ inputs.artifactVersion }}
-      path: ${{ inputs.source-folders }}
-    env:
-      RETENTION: ${{ steps.artifactRetentionDays.outputs.retentionDays }}
+    - name: Unzip Artifact
+      shell: bash
+      run: unzip ${{ inputs.artifact-version }} -d ${{ inputs.path }}/${{ inputs.artifact-version }}
+      working-directory: ${{ inputs.path }}
