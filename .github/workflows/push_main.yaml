@@ -19,7 +19,7 @@ jobs:
   PlanAndApply:
     runs-on: ubuntu-latest
 
-    environment: "xxxxx"
+    environment: "integration"
     env:
       ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}
     
