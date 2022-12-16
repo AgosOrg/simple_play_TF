@@ -38,3 +38,16 @@ jobs:
           bucket-name: neto.iac.tf-remote-state-${{ env.enviroment }}
           isReleaseBranch: true
           ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}
+
+      - name: Download Artifacts from S3
+        uses: TheGuarantors/tg-gha-workflows/.github/actions/build-artifact-download@v0.1.3
+        with:
+          AWS_ROLE_TO_ASSUME: arn:aws:iam::024326601657:role/GitHubRole
+          AWS_SESSION_NAME: MySessionName
+          bucket-name: neto.iac.tf-remote-state-${{ env.enviroment }}
+          artifact-version: ${{ env.GIT_HASH }}
+          path: ./
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: ${{ env.GIT_HASH }}
