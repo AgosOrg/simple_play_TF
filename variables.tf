@@ -3,7 +3,7 @@ variable "region" {
   default     = "eu-north-1"
   type        = string
 }
-
+/* 
 variable "environment" {
   type = string
 }
@@ -46,4 +46,4 @@ variable "client_web_origins" {
 variable "email_sender" {
   type        = string
   description = "Authorized sender email address on SES"
-}
+} */
