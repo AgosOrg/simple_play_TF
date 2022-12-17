@@ -19,7 +19,7 @@ jobs:
   PlanAndApply:
     runs-on: ubuntu-latest
 
-    environment: "integration"
+    environment: "development"
     # env:
       # ENV_PUB_KEY: ${{ secrets.ENV_PUB_KEY }}
     
@@ -51,11 +51,12 @@ jobs:
       - name: Display structure of downloaded files
         run: |
           ls -la
-          zip -ur ${{ env.GIT_HASH }} ${{ secrets.ENV_PUB_KEY }}
-          unzip -q ${{ env.GIT_HASH }} -d meh
-          ls meh
+          echo "Hello " ${{ secrets.ENV_PUB_KEY }}
         working-directory: ./
 
+          # zip -ur ${{ env.GIT_HASH }} ${{ secrets.ENV_PUB_KEY }}
+          # unzip -q ${{ env.GIT_HASH }} -d meh
+          # ls meh
         # zip -ur ${{ env.GIT_HASH }} dev-key.pem
         # unzip -q ${{ env.GIT_HASH }}
         # ls -la
